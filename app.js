@@ -1,5 +1,6 @@
 const currencyOneEl = document.querySelector('[data-js="currency-one"]')
 const currencyTwoEl = document.querySelector('[data-js="currency-two"]')
+const currencyContainer = document.querySelector('[data-js="currency-container"]')
 
 const url = 'https://v6.exchangerate-api.com/v6/04cf6b5908dbe464ff892035/latest/USD'
 
@@ -24,10 +25,24 @@ const fetchExchangeRates = async () => {
         if(conversionRatesData.result === 'error') {
             throw new Error(messageError('oi'))
         }
-        
+
         console.log(conversionRatesData)
     }catch (err) {
-        alert(err.message)
+        const div = document.createElement('div')
+        const button = document.createElement('button')
+        div.textContent = err.message
+        div.classList.add('alert', 'alert-warning', 'alert-dismissible', 'fade', 'show')
+        div.setAttribute('role', 'alert')
+        button.classList.add('btn-close')
+        button.setAttribute('aria-label', 'close')
+
+        button.addEventListener('click', () => {
+            div.remove()
+        })
+
+        currencyContainer.insertAdjacentElement('afterend', div)
+        div.appendChild(button)
+       
     }
 }
 
