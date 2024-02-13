@@ -7,8 +7,7 @@ const currencyContainer = document.querySelector('[data-js="currency-container"]
 
 let internalExchangeRates = {}
 
-const getUrl = currency => 
-    `https://v6.exchangerate-api.com/v6/04cf6b5908dbe464ff892035/latest/${currency}`
+const getUrl = currency => `https://v6.exchangerate-api.com/v6/04cf6b5908dbe464ff892035/latest/${currency}`
 
 const messageError = typeError => ({
   'unsupported-code': 'A moeda não existe em nosso banco de dados.',
@@ -40,7 +39,7 @@ const fetchExchangeRates = async url => {
 
         div.textContent = err.message
         
-        div.classList.add('alert', 'alert-warning', 'alert-dismissible', 'fade', 'show')
+        div.classList.add('alert','alert-warning','alert-dismissible','fade','show')
         div.setAttribute('role', 'alert')
         button.classList.add('btn-close')
         button.setAttribute('aria-label', 'close')
@@ -49,8 +48,8 @@ const fetchExchangeRates = async url => {
             div.remove()
         })
 
-        currencyContainer.insertAdjacentElement('afterend', div)
         div.appendChild(button)
+        currencyContainer.insertAdjacentElement('afterend', div)
        
     }
 }
@@ -67,7 +66,7 @@ const init = async () => {
     currencyTwoEl.innerHTML = getOptions('BRL')
 
     convertedValueEl.textContent = internalExchangeRates.conversion_rates.BRL.toFixed(2)
-    conversionPrecisionEl.textContent = `1 USD = ${internalExchangeRates.conversion_rates[currencyTwoEl.value]} BRL`
+    conversionPrecisionEl.textContent = `1 USD = ${internalExchangeRates.conversion_rates.BRL} BRL`
 }
 
 timesCurrencyOneEl.addEventListener('input', e => {
