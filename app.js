@@ -2,8 +2,10 @@ const currencyOneEl = document.querySelector('[data-js="currency-one"]')
 const currencyTwoEl = document.querySelector('[data-js="currency-two"]')
 const convertedValueEl = document.querySelector('[data-js="converted-value"]')
 const conversionPrecisionEl = document.querySelector('[data-js="conversion-precision"]')
-const timesCurrencyOneEl = document.querySelector('[data-js="currency-one-times"]')
-const currencyContainer = document.querySelector('[data-js="currency-container"]')
+const timesCurrencyOneEl = document
+    .querySelector('[data-js="currency-one-times"]')
+const currencyContainer = document
+    .querySelector('[data-js="currency-container"]')
 
 
 const ShowAlert = err => {
@@ -17,9 +19,9 @@ const ShowAlert = err => {
     button.classList.add('btn-close')
     button.setAttribute('aria-label', 'close')
 
-    button.addEventListener('click', () => {
-        div.remove()
-    })
+    const removeAlert = () => div.remove()
+
+    button.addEventListener('click',removeAlert)
 
     div.appendChild(button)
     currencyContainer.insertAdjacentElement('afterend', div)
@@ -31,7 +33,9 @@ const state = (() => {
         getExchangeRate: () => exchangeRate,
         setExchangeRates: newExchangeRate => {
             if(!newExchangeRate.conversion_rates) {
-                ShowAlert({ message: 'O objeto precisa ter uma propriedade converion_rates' })
+                ShowAlert({ 
+                    message: 'O objeto precisa ter uma propriedade converion_rates' 
+                })
                 return
             }
 
@@ -41,8 +45,9 @@ const state = (() => {
     }
 })()
 
-
-const getUrl = currency => `https://v6.exchangerate-api.com/v6/04cf6b5908dbe464ff892035/latest/${currency}`
+const APIKey = '04cf6b5908dbe464ff892035'
+const getUrl = currency =>
+     `https://v6.exchangerate-api.com/v6/${APIKey}/latest/${currency}`
 
 const messageError = typeError => ({
   'unsupported-code': 'A moeda não existe em nosso banco de dados.',
@@ -63,56 +68,79 @@ const fetchExchangeRates = async url => {
         const conversionRatesData = await response.json()
 
         if(conversionRatesData.result === 'error') {
-            throw new Error(messageError(conversionRatesData['error-type']))
+            const errorMessage = messageError(conversionRatesData['error-type'])
+            throw new Error(errorMessage)
         }
 
-        return conversionRatesData
+        return state.setExchangeRates(conversionRatesData)
     }catch (err) {
         ShowAlert(err)
     }
 }
 
-const showInitialInfo = exchangeRate => {
-    const getOptions = currencySelected => Object.keys(exchangeRate.conversion_rates)
-    .map(currency => `<option ${currency === currencySelected ? 'selected' : ''}>${currency}</option>`)
+const getOptions = (currencySelected, conversion_rates) => {
+    const setSelectedAttribute = currency =>
+        currency === currencySelected ? 'selected' : '' 
+    const getOptionsAsArray = currency =>
+        `<option ${setSelectedAttribute(currency)}>${currency}</option>`
+
+    return Object.keys(conversion_rates)
+    .map(getOptionsAsArray)
     .join()
+}
 
-    currencyOneEl.innerHTML = getOptions('USD')
-    currencyTwoEl.innerHTML = getOptions('BRL')
+const getMultipliedExchangeRate = conversion_rates => {
+    const currencyTwo = conversion_rates[currencyTwoEl.value]
+    return (timesCurrencyOneEl.value * currencyTwo).toFixed(2)
+}
 
-    convertedValueEl.textContent = exchangeRate.conversion_rates.BRL.toFixed(2)
-    conversionPrecisionEl.textContent = `1 USD = ${exchangeRate.conversion_rates.BRL} BRL`
+const getNotRoundExchangeRate = conversion_rates => {
+    const currencyTwo = conversion_rates[currencyTwoEl.value]
+    return `1 ${currencyOneEl.value} = ${1 * currencyTwo} ${currencyTwoEl.value}`
+}
+
+showUpdatedRates = ({ conversion_rates }) => {
+    convertedValueEl.textContent = getMultipliedExchangeRate(conversion_rates ) 
+    conversionPrecisionEl.textContent = getNotRoundExchangeRate(conversion_rates) 
+}
+
+const showInitialInfo = ({ conversion_rates }) => {
+
+    currencyOneEl.innerHTML = getOptions('USD', conversion_rates)
+    currencyTwoEl.innerHTML = getOptions('BRL', conversion_rates)
+
+    showUpdatedRates({ conversion_rates }) //shorthand Property names
 }
 
 const init = async () => {
-    const exchangeRate = state.setExchangeRates(await fetchExchangeRates(getUrl('USD')))
+    const url = getUrl('USD')
+    const exchangeRate = await fetchExchangeRates(url) 
 
     if(exchangeRate && exchangeRate.conversion_rates) {
        showInitialInfo(exchangeRate)
     }
 }
 
-showUpdatedRates = exchangeRate => {
-    convertedValueEl.textContent = (timesCurrencyOneEl.value * exchangeRate.conversion_rates[currencyTwoEl.value]).toFixed(2)
-    conversionPrecisionEl.textContent = `1 ${currencyOneEl.value} = ${1 * exchangeRate.conversion_rates[currencyTwoEl.value]} ${currencyTwoEl.value}`
+const handleTimesCurrencyOneElInput = () => {
+    const { conversion_rates } = state.getExchangeRate()
+
+    convertedValueEl.textContent = getMultipliedExchangeRate(conversion_rates) 
 }
 
-timesCurrencyOneEl.addEventListener('input', e => {
+const handleCurrencyTwoElInput =  () => {
     const exchangeRate = state.getExchangeRate()
-    console.log(exchangeRate)
-    convertedValueEl.textContent = (e.target.value * exchangeRate.conversion_rates[currencyTwoEl.value]).toFixed(2)
-})
-
-currencyTwoEl.addEventListener('input', () => {
-    const exchangeRate = state.getExchangeRate()
-    console.log(exchangeRate)
     showUpdatedRates(exchangeRate)
-})
+}
 
-currencyOneEl.addEventListener('input', async e => {
-    const exchangeRate = state.setExchangeRates(await fetchExchangeRates(getUrl(e.target.value)))
+const handleCurrencyOneElInput =  async e => {
+    const url = getUrl(e.target.value)
+    const exchangeRate = await fetchExchangeRates(url)
+
     showUpdatedRates(exchangeRate)
-})
+}
 
+timesCurrencyOneEl.addEventListener('input', handleTimesCurrencyOneElInput )
+currencyTwoEl.addEventListener('input', handleCurrencyTwoElInput)
+currencyOneEl.addEventListener('input', handleCurrencyOneElInput)
 
 init()
