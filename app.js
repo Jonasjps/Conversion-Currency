@@ -34,7 +34,7 @@ const state = (() => {
         setExchangeRates: newExchangeRate => {
             if(!newExchangeRate.conversion_rates) {
                 ShowAlert({ 
-                    message: 'O objeto precisa ter uma propriedade converion_rates' 
+                    message: 'O objeto precisa ter uma propriedade conversion_rates' 
                 })
                 return
             }
@@ -89,6 +89,7 @@ const getOptions = (currencySelected, conversion_rates) => {
     .join()
 }
 
+
 const getMultipliedExchangeRate = conversion_rates => {
     const currencyTwo = conversion_rates[currencyTwoEl.value]
     return (timesCurrencyOneEl.value * currencyTwo).toFixed(2)
@@ -102,7 +103,7 @@ const getNotRoundExchangeRate = conversion_rates => {
 showUpdatedRates = ({ conversion_rates }) => {
     convertedValueEl.textContent = getMultipliedExchangeRate(conversion_rates ) 
     conversionPrecisionEl.textContent = getNotRoundExchangeRate(conversion_rates) 
-}
+} 
 
 const showInitialInfo = ({ conversion_rates }) => {
 
