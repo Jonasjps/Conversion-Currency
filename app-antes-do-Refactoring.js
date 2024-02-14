@@ -77,11 +77,9 @@ timesCurrencyOneEl.addEventListener('input', e => {
   convertedValueEl.textContent = (e.target.value * internalExchangeRates.conversion_rates[currencyTwoEl.value]).toFixed(2)
 })
 
-currencyTwoEl.addEventListener('input', e => {
-  const currencyTwoValue = internalExchangeRates.conversion_rates[e.target.value]
-
-  convertedValueEl.textContent = (timesCurrencyOneEl.value * currencyTwoValue).toFixed(2)
-  valuePrecisionEl.textContent = `1 ${currencyOneEl.value} = ${internalExchangeRates.conversion_rates[currencyTwoEl.value]} ${currencyTwoEl.value}`
+currencyTwoEl.addEventListener('input', e => { 
+  convertedValueEl.textContent = (timesCurrencyOneEl.value * internalExchangeRates.conversion_rates[currencyTwoEl.value]).toFixed(2)
+  valuePrecisionEl.textContent = `1 ${currencyOneEl.value} = ${1 * internalExchangeRates.conversion_rates[currencyTwoEl.value]} ${currencyTwoEl.value}`
 })
 
 currencyOneEl.addEventListener('input', async e => {
@@ -90,4 +88,5 @@ currencyOneEl.addEventListener('input', async e => {
   convertedValueEl.textContent = (timesCurrencyOneEl.value * internalExchangeRates.conversion_rates[currencyTwoEl.value]).toFixed(2)
   valuePrecisionEl.textContent = `1 ${currencyOneEl.value} = ${1 * internalExchangeRates.conversion_rates[currencyTwoEl.value]} ${currencyTwoEl.value}`
 })
+
 init()
