@@ -18,13 +18,17 @@ const ShowAlert = err => {
     div.setAttribute('role', 'alert')
     button.classList.add('btn-close')
     button.setAttribute('aria-label', 'close')
-
+    div.appendChild(button)
+    div.style.textAlign = 'center'
+    div.style.margin = 'auto'
+    div.style.width = '500px'
+    currencyContainer.insertAdjacentElement('afterend', div)
+    
     const removeAlert = () => div.remove()
 
     button.addEventListener('click',removeAlert)
 
-    div.appendChild(button)
-    currencyContainer.insertAdjacentElement('afterend', div)
+   
 }
 
 const state = (() => {
@@ -45,7 +49,7 @@ const state = (() => {
     }
 })()
 
-const APIKey = '04cf6b5908dbe464ff892035'
+const APIKey = 'c26590d4fd7236521a51fca0'
 const getUrl = currency =>
      `https://v6.exchangerate-api.com/v6/${APIKey}/latest/${currency}`
 
